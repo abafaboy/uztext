@@ -1,0 +1,18 @@
+# JS build output and dependencies (built in CI)
+node_modules/
+js/dist/
+*.tgz
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>uztext demo</title>
+<meta name="description" content="Uzbek text in three scripts: Cyrillic, current Latin and the 2026 new Latin alphabet. Runs offline.">
+<style>
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --text: #1c1b19;
+  --muted: #6b6860;
+  --border: #dedbd2;
+  --accent: #0d6e5f;
+  --accent-text: #ffffff;
+  --focus: #0d6e5f55;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141412;
+    --surface: #1e1e1b;
+    --text: #ecebe6;
+    --muted: #a19e95;
+    --border: #34332f;
+    --accent: #4cc2ad;
+    --accent-text: #0b1f1b;
+    --focus: #4cc2ad55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141412;
+  --surface: #1e1e1b;
+  --text: #ecebe6;
+  --muted: #a19e95;
+  --border: #34332f;
+  --accent: #4cc2ad;
+  --accent-text: #0b1f1b;
+  --focus: #4cc2ad55;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 var(--sans);
+}
+main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+.lede { margin: 0; color: var(--muted); max-width: 60ch; }
+.lede strong { color: var(--text); font-weight: 600; }
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 6px 12px;
+  min-height: 36px;
+}
+button:hover { border-color: var(--accent); }
+button:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+#theme { flex-shrink: 0; }
+label.input { display: block; font-weight: 600; margin: 24px 0 8px; }
+textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: 1.05rem/1.5 var(--sans);
+}
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.card h2 { font-size: 0.95rem; margin: 0; }
+.card h2 small { display: block; font-weight: 400; color: var(--muted); font-size: 0.8rem; }
+.out { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 1.05rem; flex: 1; }
+.copy.done { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.key {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.key code { font-family: var(--mono); color: var(--text); }
+footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; }
+footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>uztext</h1>
+      <p class="lede">Type or paste Uzbek in <strong>any</strong> script or with any apostrophe. You get all three scripts as you type. Runs offline; nothing leaves this page.</p>
+    </div>
+    <button id="theme" type="button" aria-label="Toggle light or dark theme">Theme</button>
+  </header>
+
+  <label class="input" for="src">Input</label>
+  <textarea id="src" spellcheck="false">Ўзбекистон Республикаси пойтахти — Тошкент шаҳри.
+Санъат ва маданият. Исҳоқ 10 сентябрь куни эълон ёзди.</textarea>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="h-cyr">
+      <div class="card-head">
+        <h2 id="h-cyr">Кирилл <small>Cyrillic</small></h2>
+        <button class="copy" type="button" data-target="out-cyr">Copy</button>
+      </div>
+      <p class="out" id="out-cyr" aria-live="polite"></p>
+    </section>
+    <section class="card" aria-labelledby="h-lat">
+      <div class="card-head">
+        <h2 id="h-lat">Lotin <small>Current Latin (1995)</small></h2>
+        <button class="copy" type="button" data-target="out-lat">Copy</button>
+      </div>
+      <p class="out" id="out-lat" aria-live="polite"></p>
+    </section>
+    <section class="card" aria-labelledby="h-new">
+      <div class="card-head">
+        <h2 id="h-new">Yangi lotin <small>New Latin (Senate, 10 Sep 2026)</small></h2>
+        <button class="copy" type="button" data-target="out-new">Copy</button>
+      </div>
+      <p class="out" id="out-new" aria-live="polite"></p>
+    </section>
+  </div>
+
+  <p class="key">Search key: <code id="out-key"></code></p>
+
+  <footer>
+    The new alphabet (Ö Ğ Ş Ç) was approved by the Senate on 10 September 2026 and is awaiting the president's signature.
+    Same rules and test corpus as the <a href="https://github.com/abafaboy/uztext">uztext</a> Python and npm packages (v<span id="ver"></span>). MIT licence.
+  </footer>
+</main>
+<script>
+/* uztext bundle (generated from js/dist/esm by js/scripts/build-web.mjs) */
+var uztext = (function () {
+"use strict";
+/**
+ * Letter tables and exception lists. Mirrors python/src/uztext/_data.py;
+ * both test suites check each exception is exercised by corpus/cases.json.
+ * Sources for each rule: docs/RULES.md.
+ */
+/** U+02BB MODIFIER LETTER TURNED COMMA: the mark in oʻ and gʻ. */
+const OKINA = "ʻ";
+/** U+02BC MODIFIER LETTER APOSTROPHE: the tutuq belgisi. */
+const TUTUQ = "ʼ";
+/** Characters people type instead of ʻ or ʼ. */
+const APOSTROPHES = new Set([
+    "'", // U+0027 APOSTROPHE
+    "`", // U+0060 GRAVE ACCENT
+    "´", // ´ ACUTE ACCENT
+    "‘", // ‘ LEFT SINGLE QUOTATION MARK
+    "’", // ’ RIGHT SINGLE QUOTATION MARK
+    "‛", // ‛ SINGLE HIGH-REVERSED-9 QUOTATION MARK
+    "ʻ", // ʻ MODIFIER LETTER TURNED COMMA
+    "ʼ", // ʼ MODIFIER LETTER APOSTROPHE
+    "ʹ", // ʹ MODIFIER LETTER PRIME
+    "ʽ", // ʽ MODIFIER LETTER REVERSED COMMA
+    "′", // ′ PRIME
+    "＇", // ＇ FULLWIDTH APOSTROPHE
+]);
+const CYR_VOWELS = new Set(Array.from("аеёиоуэюяў"));
+const CYR_TO_LAT = {
+    а: "a", б: "b", в: "v", г: "g", д: "d", ё: "yo",
+    ж: "j", з: "z", и: "i", й: "y", к: "k", л: "l",
+    м: "m", н: "n", о: "o", п: "p", р: "r", с: "s",
+    т: "t", у: "u", ф: "f", х: "x", ч: "ch", ш: "sh",
+    э: "e", ю: "yu", я: "ya", ў: "o" + OKINA, қ: "q",
+    ғ: "g" + OKINA, ҳ: "h",
+    // Not part of the Uzbek Cyrillic alphabet; Uzbek spelling replaces
+    // them with шч and и (see docs/RULES.md, marked unverified).
+    щ: "shch", ы: "i",
+};
+const LAT_VOWELS = new Set(Array.from("aeiou"));
+const LAT_TO_CYR = {
+    a: "а", b: "б", d: "д", f: "ф", g: "г", h: "ҳ",
+    i: "и", j: "ж", k: "к", l: "л", m: "м", n: "н",
+    o: "о", p: "п", q: "қ", r: "р", s: "с", t: "т",
+    u: "у", v: "в", x: "х", y: "й", z: "з",
+};
+/**
+ * Cyrillic -> Latin: stems whose Latin spelling does not follow the letter
+ * rules (1995 rules §1: "sentabr, noyabr kabi soʻzlarda").
+ */
+const CYR_PREFIX_EXCEPTIONS = [
+    ["сентябр", "sentabr"],
+    ["октябр", "oktabr"],
+];
+/** Latin -> Cyrillic: whole words only. */
+const LAT_EXACT_EXCEPTIONS = {
+    sirk: "цирк",
+    sex: "цех",
+    nol: "ноль",
+};
+/**
+ * Latin -> Cyrillic: stems; the rest of the word follows the letter rules.
+ * No stem is a prefix of another (checked by the tests), so order is free.
+ */
+const LAT_PREFIX_EXCEPTIONS = [
+    ["konstitutsiya", "конституция"],
+    ["federatsiya", "федерация"],
+    ["kvitansiya", "квитанция"],
+    ["kompyuter", "компьютер"],
+    ["politsiya", "полиция"],
+    ["stansiya", "станция"],
+    ["mo" + OKINA + "jiza", "мўъжиза"],
+    ["sentabr", "сентябрь"],
+    ["konsert", "концерт"],
+    ["subyekt", "субъект"],
+    ["oktabr", "октябрь"],
+    ["noyabr", "ноябрь"],
+    ["dekabr", "декабрь"],
+    ["prinsip", "принцип"],
+    ["fevral", "февраль"],
+    ["yanvar", "январь"],
+    ["litsey", "лицей"],
+    ["sement", "цемент"],
+    ["obyekt", "объект"],
+    ["atelye", "ателье"],
+    ["aksiya", "акция"],
+    ["aprel", "апрель"],
+    ["syezd", "съезд"],
+    ["pyesa", "пьеса"],
+    ["vitse", "вице"],
+    ["iyun", "июнь"],
+    ["iyul", "июль"],
+];
+/** Current Latin <-> new (2026) Latin. */
+const CUR_TO_NEW = {
+    ["o" + OKINA]: "ö",
+    ["g" + OKINA]: "ğ",
+    sh: "ş",
+    ch: "ç",
+};
+const NEW_TO_CUR = {
+    ö: "o" + OKINA,
+    ğ: "g" + OKINA,
+    ş: "sh",
+    ç: "ch",
+};
+/** Number words (current Latin); converted to other scripts after assembly. */
+const ONES = ["", "bir", "ikki", "uch", "to" + OKINA + "rt", "besh", "olti",
+    "yetti", "sakkiz", "to" + OKINA + "qqiz"];
+const TENS = ["", "o" + OKINA + "n", "yigirma", "o" + OKINA + "ttiz", "qirq",
+    "ellik", "oltmish", "yetmish", "sakson", "to" + OKINA + "qson"];
+const SCALES = [
+    [1e9, "milliard"],
+    [1e6, "million"],
+    [1e3, "ming"],
+];
+const ZERO = "nol";
+const MAX_AMOUNT = 999999999999;
+
+/**
+ * Transliteration, apostrophe normalisation and search keys.
+ * Mirrors python/src/uztext/_core.py line for line. Any change here needs the
+ * same change there and a corpus case that pins it.
+ */
+const LETTER = /^\p{L}$/u;
+function isLetter(ch) {
+    return LETTER.test(ch);
+}
+function isUpper(ch) {
+    return ch !== ch.toLowerCase();
+}
+function isCased(ch) {
+    return ch.toLowerCase() !== ch.toUpperCase();
+}
+function has(table, key) {
+    return Object.prototype.hasOwnProperty.call(table, key);
+}
+/**
+ * Upper-case a multi-letter replacement for the capital at chars[i].
+ * Ш becomes SH inside an all-caps word and Sh otherwise: the next cased
+ * character decides; at the end of a word the previous one does.
+ */
+function upperMulti(lat, chars, i) {
+    if (Array.from(lat).length === 1)
+        return lat.toUpperCase();
+    let caps = false;
+    if (i + 1 < chars.length && isCased(chars[i + 1])) {
+        caps = isUpper(chars[i + 1]);
+    }
+    else if (i > 0 && isCased(chars[i - 1])) {
+        caps = isUpper(chars[i - 1]);
+    }
+    return caps ? lat.toUpperCase() : lat[0].toUpperCase() + lat.slice(1);
+}
+/** Copy the casing pattern of src (lower, Title or UPPER) to repl. */
+function applyCase(src, repl) {
+    const s = src.join("");
+    if (src.length > 1 && s === s.toUpperCase() && s !== s.toLowerCase()) {
+        return repl.toUpperCase();
+    }
+    if (src.length > 0 && isUpper(src[0])) {
+        return repl[0].toUpperCase() + repl.slice(1);
+    }
+    return repl;
+}
+/** Split into [isWord, chunk] runs; words are maximal runs of letters. */
+function words(chars) {
+    const out = [];
+    let start = 0;
+    for (let i = 1; i <= chars.length; i++) {
+        if (i === chars.length || isLetter(chars[i]) !== isLetter(chars[start])) {
+            out.push([isLetter(chars[start]), chars.slice(start, i)]);
+            start = i;
+        }
+    }
+    return out;
+}
+function startsWith(word, stem) {
+    return word.join("").toLowerCase().startsWith(stem);
+}
+// ---------------------------------------------------------------------------
+// Apostrophes
+/**
+ * Fix apostrophe look-alikes and Unicode composition.
+ *  - NFC composition (O + combining diaeresis -> Ö).
+ *  - Ș ș (comma below) -> Ş ş (cedilla).
+ *  - Any look-alike after o/g -> U+02BB (oʻ, gʻ).
+ *  - Any look-alike between two other letters -> U+02BC (tutuq belgisi).
+ *  - Anything else (quotes around words, feet/minutes after digits) is kept.
+ */
+function normalize(text) {
+    const chars = Array.from(text.normalize("NFC").replace(/Ș/g, "Ş").replace(/ș/g, "ş"));
+    const out = [];
+    const n = chars.length;
+    for (let i = 0; i < n; i++) {
+        const ch = chars[i];
+        if (APOSTROPHES.has(ch)) {
+            const prev = i > 0 ? chars[i - 1] : "";
+            const nxt = i + 1 < n ? chars[i + 1] : "";
+            if (prev === "o" || prev === "O" || prev === "g" || prev === "G") {
+                out.push(OKINA);
+                continue;
+            }
+            if (prev && nxt && isLetter(prev) && isLetter(nxt)) {
+                out.push(TUTUQ);
+                continue;
+            }
+        }
+        out.push(ch);
+    }
+    return out.join("");
+}
+// ---------------------------------------------------------------------------
+// Cyrillic -> current Latin
+function cyrScan(word, start) {
+    const out = [];
+    const n = word.length;
+    for (let i = start; i < n; i++) {
+        const ch = word[i];
+        const lc = ch.toLowerCase();
+        const prev = i > 0 ? word[i - 1].toLowerCase() : "";
+        const nxt = i + 1 < n ? word[i + 1].toLowerCase() : "";
+        let lat;
+        if (lc === "е") {
+            lat = i === 0 || CYR_VOWELS.has(prev) || prev === "ъ" || prev === "ь" ? "ye" : "e";
+        }
+        else if (lc === "ц") {
+            lat = CYR_VOWELS.has(prev) ? "ts" : "s";
+        }
+        else if (lc === "ъ") {
+            // Dropped after ў (мўъжиза -> moʻjiza) and between a consonant and
+            // е/ё/ю/я (объект -> obyekt); otherwise the tutuq (маъюс -> maʼyus).
+            const iotated = ["е", "ё", "ю", "я"].includes(nxt) && !CYR_VOWELS.has(prev);
+            lat = prev === "ў" || iotated ? "" : TUTUQ;
+        }
+        else if (lc === "ь") {
+            lat = "";
+        }
+        else if (lc === "с" && nxt === "ҳ") {
+            lat = "s" + TUTUQ;
+        }
+        else if (has(CYR_TO_LAT, lc)) {
+            lat = CYR_TO_LAT[lc];
+        }
+        else {
+            out.push(ch);
+            continue;
+        }
+        if (ch !== lc && lat)
+            lat = upperMulti(lat, word, i);
+        out.push(lat);
+    }
+    return out.join("");
+}
+function cyrWord(word) {
+    for (const [stem, repl] of CYR_PREFIX_EXCEPTIONS) {
+        if (startsWith(word, stem)) {
+            const len = Array.from(stem).length;
+            return applyCase(word.slice(0, len), repl) + cyrScan(word, len);
+        }
+    }
+    return cyrScan(word, 0);
+}
+function cyrToLat(text) {
+    return words(Array.from(text))
+        .map(([w, c]) => (w ? cyrWord(c) : c.join("")))
+        .join("");
+}
+// ---------------------------------------------------------------------------
+// Current Latin -> Cyrillic
+function latStartOrVowel(word, i) {
+    if (i === 0)
+        return true;
+    const prev = word[i - 1].toLowerCase();
+    if (LAT_VOWELS.has(prev))
+        return true;
+    return prev === OKINA && i >= 2 && word[i - 2].toLowerCase() === "o";
+}
+function latScan(word, start) {
+    const out = [];
+    const n = word.length;
+    let i = start;
+    while (i < n) {
+        const ch = word[i];
+        const lc = ch.toLowerCase();
+        const nxt = i + 1 < n ? word[i + 1].toLowerCase() : "";
+        const nxt2 = i + 2 < n ? word[i + 2] : "";
+        let step = 1;
+        let cyr;
+        if ((lc === "o" || lc === "g") && nxt === OKINA) {
+            cyr = lc === "o" ? "ў" : "ғ";
+            step = 2;
+        }
+        else if (lc === "s" && nxt === "h") {
+            cyr = "ш";
+            step = 2;
+        }
+        else if (lc === "c" && nxt === "h") {
+            cyr = "ч";
+            step = 2;
+        }
+        else if (lc === "y" && nxt === "e") {
+            if (latStartOrVowel(word, i)) {
+                cyr = "е";
+                step = 2;
+            }
+            else {
+                cyr = "й";
+            }
+        }
+        else if (lc === "y" && (nxt === "a" || nxt === "o" || nxt === "u") && nxt2 !== OKINA) {
+            cyr = { a: "я", o: "ё", u: "ю" }[nxt];
+            step = 2;
+        }
+        else if (lc === "e") {
+            cyr = latStartOrVowel(word, i) ? "э" : "е";
+        }
+        else if (ch === TUTUQ) {
+            const prev = i > 0 ? word[i - 1].toLowerCase() : "";
+            cyr = prev === "s" && nxt === "h" ? "" : "ъ";
+        }
+        else if (has(LAT_TO_CYR, lc)) {
+            cyr = LAT_TO_CYR[lc];
+        }
+        else {
+            cyr = ch;
+        }
+        if (isUpper(ch))
+            cyr = cyr.toUpperCase();
+        out.push(cyr);
+        i += step;
+    }
+    return out.join("");
+}
+function latWord(word) {
+    const lw = word.join("").toLowerCase();
+    if (has(LAT_EXACT_EXCEPTIONS, lw))
+        return applyCase(word, LAT_EXACT_EXCEPTIONS[lw]);
+    for (const [stem, repl] of LAT_PREFIX_EXCEPTIONS) {
+        if (startsWith(word, stem)) {
+            const len = Array.from(stem).length;
+            return applyCase(word.slice(0, len), repl) + latScan(word, len);
+        }
+    }
+    return latScan(word, 0);
+}
+function latToCyr(text) {
+    return words(Array.from(text))
+        .map(([w, c]) => (w ? latWord(c) : c.join("")))
+        .join("");
+}
+// ---------------------------------------------------------------------------
+// Current Latin <-> new Latin
+function curToNew(text) {
+    const chars = Array.from(text);
+    const out = [];
+    const n = chars.length;
+    let i = 0;
+    while (i < n) {
+        const pair = (chars[i] + (i + 1 < n ? chars[i + 1] : "")).toLowerCase();
+        if (has(CUR_TO_NEW, pair)) {
+            const nw = CUR_TO_NEW[pair];
+            out.push(isUpper(chars[i]) ? nw.toUpperCase() : nw);
+            i += 2;
+        }
+        else {
+            out.push(chars[i]);
+            i += 1;
+        }
+    }
+    return out.join("");
+}
+function newToCur(text) {
+    const chars = Array.from(text);
+    return chars
+        .map((ch, i) => {
+        const lc = ch.toLowerCase();
+        if (!has(NEW_TO_CUR, lc))
+            return ch;
+        const cur = NEW_TO_CUR[lc];
+        return ch !== lc ? upperMulti(cur, chars, i) : cur;
+    })
+        .join("");
+}
+// ---------------------------------------------------------------------------
+// Public API
+/** Any script -> current Latin (1995 alphabet). */
+function toLatin(text) {
+    return newToCur(cyrToLat(normalize(text)));
+}
+/** Any script -> Cyrillic. */
+function toCyrillic(text) {
+    return latToCyr(newToCur(normalize(text)));
+}
+/** Any script -> new Latin (Ö Ğ Ş Ç, Senate-approved 10 Sep 2026). */
+function toNew(text) {
+    return curToNew(cyrToLat(normalize(text)));
+}
+/** New Latin -> current Latin. Leaves Cyrillic untouched. */
+function fromNew(text) {
+    return newToCur(normalize(text));
+}
+/** Fold every script and apostrophe variant to one lower-case key. */
+function searchKey(text) {
+    return toNew(text).toLowerCase().split(TUTUQ).join("").split(OKINA).join("");
+}
+
+/** Amounts in words for invoices (sumWords). Mirrors python/src/uztext/_numbers.py. */
+const SCRIPTS = {
+    latin: toLatin,
+    cyrillic: toCyrillic,
+    new: toNew,
+};
+const SPACES = /[    ]/g;
+const DIGITS = /^[0-9]+$/;
+const GROUPED = /^[0-9]{1,3}(?:[.,][0-9]{3})+$/;
+/** Parse "1 250 000,50", "1,250,000.50", "1250000.5" -> [1250000, 50]. */
+function parseString(raw) {
+    const bad = () => new RangeError(`not an amount: ${JSON.stringify(raw)}`);
+    const s = raw.trim().replace(SPACES, "");
+    const last = Math.max(s.lastIndexOf("."), s.lastIndexOf(","));
+    let intPart = s;
+    let frac = "";
+    if (last >= 0 && s.length - last - 1 >= 1 && s.length - last - 1 <= 2) {
+        intPart = s.slice(0, last);
+        frac = s.slice(last + 1);
+        if (!DIGITS.test(frac))
+            throw bad();
+    }
+    if (GROUPED.test(intPart) && !intPart.startsWith("0")) {
+        // Thousands separators must all be the same character and must not be
+        // the decimal separator.
+        const seps = new Set(intPart.replace(/[0-9]/g, ""));
+        if (seps.size !== 1 || (frac && seps.has(s[last])))
+            throw bad();
+        intPart = intPart.replace(/[.,]/g, "");
+    }
+    if (!DIGITS.test(intPart))
+        throw bad();
+    return [Number(intPart), frac ? Number(frac.padEnd(2, "0")) : 0];
+}
+/** Parse a canonical number string ("1250000.5") from a JS number. */
+function parsePlain(s) {
+    const dot = s.indexOf(".");
+    const intPart = dot < 0 ? s : s.slice(0, dot);
+    let frac = dot < 0 ? "" : s.slice(dot + 1);
+    if (!DIGITS.test(intPart) || (frac && !DIGITS.test(frac))) {
+        throw new RangeError(`not an amount: ${JSON.stringify(s)}`);
+    }
+    frac = frac.replace(/0+$/, "");
+    if (frac.length > 2)
+        throw new RangeError(`more than two decimals: ${JSON.stringify(s)}`);
+    return [Number(intPart), Number(frac.padEnd(2, "0"))];
+}
+function parse(amount) {
+    if (typeof amount === "number") {
+        if (Number.isInteger(amount)) {
+            if (amount < 0)
+                throw new RangeError("amount must not be negative");
+            return [amount, 0];
+        }
+        return parsePlain(String(amount));
+    }
+    if (typeof amount === "string")
+        return parseString(amount);
+    throw new TypeError("amount must be a number or a string");
+}
+function belowThousand(n) {
+    const words = [];
+    const hundreds = Math.floor(n / 100);
+    const rest = n % 100;
+    if (hundreds)
+        words.push(ONES[hundreds], "yuz");
+    const tens = Math.floor(rest / 10);
+    const ones = rest % 10;
+    if (tens)
+        words.push(TENS[tens]);
+    if (ones)
+        words.push(ONES[ones]);
+    return words;
+}
+function intWords(n) {
+    if (n === 0)
+        return ZERO;
+    const words = [];
+    for (const [value, name] of SCALES) {
+        const group = Math.floor(n / value);
+        n %= value;
+        if (group)
+            words.push(...belowThousand(group), name);
+    }
+    words.push(...belowThousand(n));
+    return words.join(" ");
+}
+/**
+ * Write an amount in Uzbek words, e.g. for an invoice.
+ *
+ *     sumWords("1 250 000,50") // "bir million ikki yuz ellik ming soʻm ellik tiyin"
+ *
+ * amount is a number or a string with up to two decimals ("," or "." as
+ * decimal separator; spaces, "," or "." as thousands separators). The
+ * integer part may be at most 999 999 999 999.
+ */
+function sumWords(amount, options = {}) {
+    const { script = "latin", currency = "so'm", subunit = "tiyin" } = options;
+    if (!Object.prototype.hasOwnProperty.call(SCRIPTS, script)) {
+        throw new RangeError(`script must be one of ${Object.keys(SCRIPTS).join(", ")}`);
+    }
+    const [whole, cents] = parse(amount);
+    if (whole > MAX_AMOUNT)
+        throw new RangeError(`amount must not exceed ${MAX_AMOUNT}`);
+    const parts = [intWords(whole), currency];
+    if (cents)
+        parts.push(intWords(cents), subunit);
+    return SCRIPTS[script](parts.filter((p) => p).join(" "));
+}
+return { VERSION: "0.1.0", toLatin, toCyrillic, toNew, fromNew, normalize, searchKey, sumWords };
+})();
+</script>
+<script>
+(function () {
+  var src = document.getElementById("src");
+  var outs = {
+    cyr: document.getElementById("out-cyr"),
+    lat: document.getElementById("out-lat"),
+    nw: document.getElementById("out-new"),
+    key: document.getElementById("out-key"),
+  };
+  function render() {
+    var t = src.value;
+    outs.cyr.textContent = uztext.toCyrillic(t);
+    outs.lat.textContent = uztext.toLatin(t);
+    outs.nw.textContent = uztext.toNew(t);
+    outs.key.textContent = uztext.searchKey(t);
+  }
+  document.getElementById("ver").textContent = uztext.VERSION;
+  src.addEventListener("input", render);
+  render();
+
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = document.getElementById(btn.dataset.target).textContent;
+      var done = function () {
+        btn.textContent = "Copied";
+        btn.classList.add("done");
+        setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1200);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); done(); } catch (e) { /* copy unavailable */ }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("theme");
+  function stored() { try { return localStorage.getItem("uztext-theme"); } catch (e) { return null; } }
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function label() { themeBtn.textContent = isDark() ? "Light" : "Dark"; }
+  var saved = stored();
+  if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+  label();
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("uztext-theme", next); } catch (e) { /* storage unavailable */ }
+    label();
+  });
+})();
+</script>
+</body>
+</html>

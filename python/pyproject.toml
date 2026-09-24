@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uztext"
+version = "0.1.0"
+description = "Uzbek text toolkit: Cyrillic, current Latin and the 2026 new Latin alphabet (Ö Ğ Ş Ç), apostrophe normaliser, search keys, amounts in words."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Abdulfayyod Mukhamedov" }]
+keywords = ["uzbek", "transliteration", "cyrillic", "latin", "alphabet", "o'zbek", "normalization"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Uzbek",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/abafaboy/uztext"
+Issues = "https://github.com/abafaboy/uztext/issues"
+
+[project.scripts]
+uztext = "uztext.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+uztext = ["py.typed"]

@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Corpus and unit tests
+        working-directory: python
+        run: PYTHONPATH=src python -m unittest discover -s tests -t .
+      - name: Install package and smoke-test the CLI
+        run: |
+          python -m pip install ./python
+          test "$(uztext to-latin 'Ўзбекистон')" = "Oʻzbekiston"
+          test "$(echo 'Oʻzbekiston' | uztext to-new)" = "Özbekiston"
+
+  js:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dev dependencies
+        working-directory: js
+        run: npm ci
+      - name: Build (tsc, ESM + CJS) and run the corpus
+        working-directory: js
+        run: npm test
+
+  web:
+    name: Demo page is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - working-directory: js
+        run: npm ci && npm run build:web
+      - run: git diff --exit-code web/index.html

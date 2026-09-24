@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>uztext demo</title>
+<meta name="description" content="Uzbek text in three scripts: Cyrillic, current Latin and the 2026 new Latin alphabet. Runs offline.">
+<style>
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --text: #1c1b19;
+  --muted: #6b6860;
+  --border: #dedbd2;
+  --accent: #0d6e5f;
+  --accent-text: #ffffff;
+  --focus: #0d6e5f55;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141412;
+    --surface: #1e1e1b;
+    --text: #ecebe6;
+    --muted: #a19e95;
+    --border: #34332f;
+    --accent: #4cc2ad;
+    --accent-text: #0b1f1b;
+    --focus: #4cc2ad55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141412;
+  --surface: #1e1e1b;
+  --text: #ecebe6;
+  --muted: #a19e95;
+  --border: #34332f;
+  --accent: #4cc2ad;
+  --accent-text: #0b1f1b;
+  --focus: #4cc2ad55;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 var(--sans);
+}
+main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+.lede { margin: 0; color: var(--muted); max-width: 60ch; }
+.lede strong { color: var(--text); font-weight: 600; }
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 6px 12px;
+  min-height: 36px;
+}
+button:hover { border-color: var(--accent); }
+button:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+#theme { flex-shrink: 0; }
+label.input { display: block; font-weight: 600; margin: 24px 0 8px; }
+textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: 1.05rem/1.5 var(--sans);
+}
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.card h2 { font-size: 0.95rem; margin: 0; }
+.card h2 small { display: block; font-weight: 400; color: var(--muted); font-size: 0.8rem; }
+.out { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 1.05rem; flex: 1; }
+.copy.done { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.key {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.key code { font-family: var(--mono); color: var(--text); }
+footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; }
+footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>uztext</h1>
+      <p class="lede">Type or paste Uzbek in <strong>any</strong> script or with any apostrophe. You get all three scripts as you type. Runs offline; nothing leaves this page.</p>
+    </div>
+    <button id="theme" type="button" aria-label="Toggle light or dark theme">Theme</button>
+  </header>
+
+  <label class="input" for="src">Input</label>
+  <textarea id="src" spellcheck="false">Ўзбекистон Республикаси пойтахти — Тошкент шаҳри.
+Санъат ва маданият. Исҳоқ 10 сентябрь куни эълон ёзди.</textarea>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="h-cyr">
+      <div class="card-head">
+        <h2 id="h-cyr">Кирилл <small>Cyrillic</small></h2>
+        <button class="copy" type="button" data-target="out-cyr">Copy</button>
+      </div>
+      <p class="out" id="out-cyr" aria-live="polite"></p>
+    </section>
+    <section class="card" aria-labelledby="h-lat">
+      <div class="card-head">
+        <h2 id="h-lat">Lotin <small>Current Latin (1995)</small></h2>
+        <button class="copy" type="button" data-target="out-lat">Copy</button>
+      </div>
+      <p class="out" id="out-lat" aria-live="polite"></p>
+    </section>
+    <section class="card" aria-labelledby="h-new">
+      <div class="card-head">
+        <h2 id="h-new">Yangi lotin <small>New Latin (Senate, 10 Sep 2026)</small></h2>
+        <button class="copy" type="button" data-target="out-new">Copy</button>
+      </div>
+      <p class="out" id="out-new" aria-live="polite"></p>
+    </section>
+  </div>
+
+  <p class="key">Search key: <code id="out-key"></code></p>
+
+  <footer>
+    The new alphabet (Ö Ğ Ş Ç) was approved by the Senate on 10 September 2026 and is awaiting the president's signature.
+    Same rules and test corpus as the <a href="https://github.com/abafaboy/uztext">uztext</a> Python and npm packages (v<span id="ver"></span>). MIT licence.
+  </footer>
+</main>
+<script>
+/* uztext bundle (generated from js/dist/esm by js/scripts/build-web.mjs) */
+/*UZTEXT_BUNDLE*/
+</script>
+<script>
+(function () {
+  var src = document.getElementById("src");
+  var outs = {
+    cyr: document.getElementById("out-cyr"),
+    lat: document.getElementById("out-lat"),
+    nw: document.getElementById("out-new"),
+    key: document.getElementById("out-key"),
+  };
+  function render() {
+    var t = src.value;
+    outs.cyr.textContent = uztext.toCyrillic(t);
+    outs.lat.textContent = uztext.toLatin(t);
+    outs.nw.textContent = uztext.toNew(t);
+    outs.key.textContent = uztext.searchKey(t);
+  }
+  document.getElementById("ver").textContent = uztext.VERSION;
+  src.addEventListener("input", render);
+  render();
+
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = document.getElementById(btn.dataset.target).textContent;
+      var done = function () {
+        btn.textContent = "Copied";
+        btn.classList.add("done");
+        setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1200);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); done(); } catch (e) { /* copy unavailable */ }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("theme");
+  function stored() { try { return localStorage.getItem("uztext-theme"); } catch (e) { return null; } }
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function label() { themeBtn.textContent = isDark() ? "Light" : "Dark"; }
+  var saved = stored();
+  if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+  label();
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("uztext-theme", next); } catch (e) { /* storage unavailable */ }
+    label();
+  });
+})();
+</script>
+</body>
+</html>
